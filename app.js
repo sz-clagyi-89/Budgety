@@ -38,6 +38,14 @@ var budgetController = (function() {
 		this.value = this.value * data.rate;
 	};
 
+	Expense.prototype.returnVal = function(){
+		return this.value;
+	}
+
+	Income.prototype.returnVal = function(){
+		return this.value;
+	}
+
 
 
 	var calculateTotal = function(type) {
@@ -193,6 +201,11 @@ var budgetController = (function() {
 			});
 			
 			return addRate;
+		},
+
+		getItemsArray(type) {
+			var array = Array.from(data.allItems[type].map(el => el.value));
+			return array;
 		},
 
 		testing: function() {
@@ -393,7 +406,29 @@ var controller = (function(budgetCtrl, UICtrl) {
 		document.querySelector(DOM.inputCurrency).addEventListener("change", changeCurrency);
 	};
 
+	var iterateItems = function(type, dataArray){
+		var array = document.querySelectorAll('.' + type + ' .item__value');
+		array.forEach((curr, index) =>  {
+			curr.textContent = dataArray[index]; //formatNumbers(num, type)
+		});
+	}
+
 	var firstCurr = document.querySelector(".add__currency").value;
+
+		var updateItemsCurrency = function(){
+			// getting inc and exp values 
+			var dataInc = budgetCtrl.getItemsArray('inc');
+			var dataExp = budgetCtrl.getItemsArray('exp');
+			console.log(dataInc);
+			console.log(dataExp);
+
+			// getting the value fields
+			
+			iterateItems('income', dataInc);
+			iterateItems('expenses', dataExp);
+
+		}
+
 
 		var changeCurrency = function(event){
     		var rateArr = [];
@@ -410,6 +445,8 @@ var controller = (function(budgetCtrl, UICtrl) {
 			budgetCtrl.calcNewCurrValues(String(rateArr[0]), String(rateArr[1]));
 			// 3. update UI
 			updateBudget();
+			// 4. update UI items
+			updateItemsCurrency()
 
 		};
 
