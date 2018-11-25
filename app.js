@@ -8,6 +8,14 @@ var budgetController = (function() {
 		this.percentage = -1;
 	};
 
+	var Income = function(id, description, value) {
+		this.id = id;
+		this.description = description;
+		this.value = value;
+	};
+
+
+
 	Expense.prototype.calcPercentage = function(totalIncome) {
 		if (totalIncome > 0)
 			this.percentage = Math.round((this.value / totalIncome) * 100);
@@ -20,11 +28,17 @@ var budgetController = (function() {
 		return this.percentage;
 	};
 
-	var Income = function(id, description, value) {
-		this.id = id;
-		this.description = description;
-		this.value = value;
+
+
+	Expense.prototype.countNewValues = function(rate){
+		this.value = this.value * data.rate;
 	};
+
+	Income.prototype.countNewValues = function(rate){
+		this.value = this.value * data.rate;
+	};
+
+
 
 	var calculateTotal = function(type) {
 		var sum = 0;
@@ -32,6 +46,23 @@ var budgetController = (function() {
 			sum += cur.value;
 		});
 		data.totals[type] = sum;
+	};
+
+	var setRate = function(from, to){
+		var rates = [0.0031, 320];
+		var HUFEUR = rates[0];
+		var EURHUF = rates[1];
+
+		var rate = 0;
+		if (from === "HUF" && to === "EUR"){
+			rate = HUFEUR;
+		} else if (from === "EUR" && to === "HUF"){
+			rate = EURHUF;
+		}
+
+		data.rate = rate;
+
+		return rate;
 	};
 
 	var data = {
@@ -46,6 +77,8 @@ var budgetController = (function() {
 		budget: 0,
 		percentage: -1
 	};
+
+	window.d = data.allItems;
 
 	return {
 		addItem: function(type, des, val) {
@@ -148,6 +181,20 @@ var budgetController = (function() {
 			};
 		},
 
+		calcNewCurrValues: function(from, to) {
+
+			var addRate = setRate(from, to);
+
+			data.allItems.inc.forEach(function(cur){
+				cur.countNewValues(addRate);
+			});
+			data.allItems.exp.forEach(function(cur){
+				cur.countNewValues(addRate);
+			});
+			
+			return addRate;
+		},
+
 		testing: function() {
 			console.log(data);
 			console.log(data.totals);
@@ -166,6 +213,7 @@ var UIController = (function() {
 		inputType: ".add__type",
 		inputDescription: ".add__description",
 		inputValue: ".add__value",
+		inputCurrency: ".add__currency",
 		// from controller
 		inputBtn: ".add__btn",
 		incomeContainer: ".income__list",
@@ -340,7 +388,30 @@ var controller = (function(budgetCtrl, UICtrl) {
 		document.querySelector(DOM.container).addEventListener("click", ctrlDelete);
 
 		document.querySelector(DOM.inputType).addEventListener("change", UICtrl.changedType);
+
+		// CURRENCY TRIGGER
+		document.querySelector(DOM.inputCurrency).addEventListener("change", changeCurrency);
 	};
+
+	var firstCurr = document.querySelector(".add__currency").value;
+
+		var changeCurrency = function(event){
+    		var rateArr = [];
+    		rateArr.push(firstCurr);
+    		//window.r = rateArr;
+			// 1. UI get currency types (preceding / new)
+    		//console.log(rateArr[0]);
+    		rateArr.push(event.target.value);
+    		firstCurr = rateArr[1];
+    		
+    		console.log(rateArr[1]);
+			//console.log(firstCurr);
+			// 2. calc new values in Budget
+			budgetCtrl.calcNewCurrValues(String(rateArr[0]), String(rateArr[1]));
+			// 3. update UI
+			updateBudget();
+
+		};
 
 	// 2nd part of controller
 	var updateBudget = function() {

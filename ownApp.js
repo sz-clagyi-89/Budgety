@@ -103,10 +103,6 @@ var budgetController = (function() {
 			}
 		},
 
-		/*getPercentage: function() {
-
-		},*/
-
 		deleteItem: function(type, id) {
 			var ids, index
 			// id = 6;
@@ -124,8 +120,7 @@ var budgetController = (function() {
 			if (index !== -1) {
 				data.allItems[type].splice(index, 1);
 			}
-		
-				updateItemPercentages();
+			updateItemPercentages();
 		
 		},
 
@@ -252,10 +247,7 @@ var controller = (function(budgetCtrl, UICtrl) {
 			}
 		});
 
-
 		document.querySelector(DOM.container).addEventListener("click", ctrlDelete);
-
-
 	};
 
 

@@ -124,6 +124,7 @@ body {
     text-align: center;
 }
 
+.add__currency,
 .add__type {
     width: 55px;
     border: 1px solid #e7e7e7;
@@ -168,12 +169,18 @@ body {
 
 .add__type:focus,
 .add__description:focus,
-.add__value:focus {
+.add__value:focus,
+.add__currency:focus {
     outline: none;
     border: 1px solid #28B9B5;
 }
 
 .add__btn:focus { outline: none; }
+
+span .add__currency {
+    font-size: 12px;
+    text-align: center;
+}
 
 /***** LISTS *****/
 .container {
